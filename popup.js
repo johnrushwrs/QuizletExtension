@@ -1,5 +1,6 @@
 var bkg = chrome.extension.getBackgroundPage();
 var access_code = null;
+var access_token = null;
 // bkg.console.log('foo');
 
 function change_html(newUrl){
@@ -49,23 +50,38 @@ function login(){
 		  		console.log(redirect_url);
 		  		console.log(typeof(redirect_url));
 		  		var result = redirect_url.split('/');
-		  		var code = redirect_url.split('&')[1]
-		  		console.log(code)
+		  		var code = redirect_url.split('&')[1];
+		  		console.log("before slicing the code is " + code);
 		  		code = code.slice(5,code.length);
 		  		// console.log("THis got ran");
 		  		console.log("The code to be sent to ask for the token is " + code);
+		  		access_code = code;
 
-		  		chrome.identity.launchWebAuthFlow({
-		  			'url' : "https://api.quizlet.com/oauth/token", 'interactive' : true
-		  		}, function(redirect_url){
-		  				console.log(redirect_url);
-		  		});
+		  		var url = "https://api.quizlet.com/oauth/token";
+
+		  		var xhttp = new XMLHttpRequest();
+		        var method = "POST";
+		        xhttp.open(method, url, true);
+		        // xhttp.setRequestHeader("Host", "https://quizlet.api.com");
+		        xhttp.setRequestHeader("Authorization", "Basic " + "amNIYndIUks3azp2YWJQbjR2ZUtHR0Y2dFFnM0E1Ulcy");
+		        xhttp.setRequestHeader("Content-Type", "application/x-www-form-url-encoded");
+		        
+		        xhttp.onload = function() {
+		            handle_token(xhttp.responseText);
+		        };
+
+		        data = "grant_type=authorization_code&code=" + access_code;
+
+		        xhttp.send(data);
 
 		   });
 
+}
 
-
-
+function handle_token(responseText) {
+	console.log(responseText);
+	access_token = responseText;
+	change_html("popup.html");
 }
 
 function httpGetAsync(theUrl, callback)
