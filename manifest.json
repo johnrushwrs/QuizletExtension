@@ -14,11 +14,17 @@
 
 	"browser_action" : {
 		"default_icon" : "quizlet_logo.png",
-		"default_popup" : "popup.html"
+		"default_popup" : "login.html"
 	},
 
 	"background" : {
 		"scripts" : ["background.js"]
-	}
+	},
+
+	"permissions" : [
+		"https://quizlet.com/*",
+		"storage",
+		"identity"
+	]
 }
 
